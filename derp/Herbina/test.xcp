@@ -1,0 +1,35 @@
+            new LiteGraph.ContextMenu(
+                menuKey,
+                {
+                    event: e,
+                    callback: function (selectedDisplayString) {
+                        toggleMenuOptions.some(optionSet => {
+                            for (const optionName in optionSet) {
+                                if (optionName !== 'ToggleMenuName') {
+                                    const [stateProperty, activeText, inactiveText] = optionSet[optionName];
+                                    const currentState = node.prop[stateProperty];
+                                    const effectType = optionSet.hasOwnProperty('EffectType') ? optionSet['EffectType'] : 'boolean'; // Assuming 'EffectType' is a new property specifying the type
+                                    const expectedDisplay = effectType === 'boolean'
+                                        ? currentState ? `${activeText} ${optionName}` : `${inactiveText} ${optionName}`
+                                        : activeText; // For 'set', we use the activeText directly
+
+                                    if (selectedDisplayString === expectedDisplay) {
+                                        if (effectType === 'boolean') {
+                                            typeof currentState === 'boolean' && (node.prop[stateProperty] = !currentState);
+                                        } else { // Handle 'set' types
+                                            // Assuming we directly set the property here, adjust as per actual logic
+                                            node.prop[stateProperty] = activeText;
+                                        }
+                                        node.CanvasShapeChange(optionName); // Update this to reflect the correct action handler
+                                        return true; // Exit the loop once the action is found
+                                    }
+                                }
+                            }
+                            return false; // Continue to the next optionSet if not found
+                        });
+                    },
+                    parentMenu: menu,
+                    node: node
+                }
+            );
+        }
